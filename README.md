@@ -46,6 +46,9 @@ Browser benchmark:
 ```bash
 npx playwright install chromium
 npm run benchmark
+
+# Production HTTP/2 / HTTP/3 probe
+npm run benchmark:network
 ```
 
 ## Deploy
@@ -60,3 +63,15 @@ The deployment target is Cloudflare Workers Static Assets.
 ## Important
 
 The 8.33 ms target is a rendering/delivery goal, not a claim that arbitrary internet round trips can complete in microseconds. Real cold-load latency is bounded by DNS, transport setup, RTT, device scheduling, and display refresh. CI therefore treats the byte/request contract as the hard gate and reports browser timing separately.
+
+
+## Production network benchmark
+
+`npm run benchmark:network` launches headless Chromium twice:
+
+- **auto** — normal browser protocol negotiation.
+- **forced-h3** — Chromium starts with QUIC enabled and `--origin-to-force-quic-on=load-webpage-in-1f.pages.dev:443`.
+
+Each mode records a cold and warm navigation, including the negotiated protocol, TTFB, FCP, connection reuse, transfer size, remote address, and cache flags in `network-benchmark.json`.
+
+GitHub-hosted runners may block or vary UDP/QUIC availability, so failure to negotiate H3 is reported as data rather than failing the whole workflow.
