@@ -18,7 +18,7 @@ An experiment in extreme web delivery: one initial document, zero external rende
 
 ## Architecture
 
-The first viewport is a self-contained HTML document with inline critical CSS and a tiny inline boot loader. Deferred fragments begin only after two animation frames, so below-the-fold content cannot compete with the first paint.
+The first viewport is a self-contained HTML document with inline critical CSS and a tiny inline boot loader. Deferred fragments are not allowed to start until the browser reports `first-contentful-paint`, so below-the-fold content cannot compete with the first paint.
 
 ```
 request /
