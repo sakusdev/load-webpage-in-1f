@@ -1,0 +1,1 @@
+let o=new PerformanceObserver(e=>{if(e.getEntries().some(x=>x.name==="first-contentful-paint"))o.disconnect(),import("/boot.js")});o.observe({type:"paint",buffered:true});
