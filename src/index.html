@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07080b">
+<meta name="description" content="A webpage engineered to render its first viewport in one frame.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='50' font-size='50'>⚡</text></svg>">
+<title>1F — Load a webpage in one frame</title>
+<style>/*__CRITICAL_CSS__*/</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/" aria-label="1F home"><span>1F</span><i></i></a>
+  <div class="status"><b></b>first-flight architecture</div>
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="grid" aria-hidden="true"></div>
+    <p class="kicker">8.33 ms target · 120 Hz</p>
+    <h1 id="hero-title">Load the web<br><em>in one frame.</em></h1>
+    <p class="lede">One document. Zero render-blocking dependencies. Everything below the fold waits its turn.</p>
+    <div class="actions">
+      <a class="primary" href="#architecture">See the architecture <span>↘</span></a>
+      <span class="budget">≤ 12 KiB Brotli</span>
+    </div>
+    <div class="metrics" aria-label="performance contract">
+      <div><strong>1</strong><span>initial request</span></div>
+      <div><strong>0</strong><span>frameworks</span></div>
+      <div><strong>0</strong><span>web fonts</span></div>
+      <div><strong>1F</strong><span>first viewport</span></div>
+    </div>
+  </section>
+
+  <section id="architecture" class="slot next" data-fragment="/fragments/next.html" aria-busy="true">
+    <div class="skeleton"><span></span><span></span><span></span></div>
+  </section>
+
+  <section class="slot deep" data-fragment="/fragments/deep.html" aria-busy="true">
+    <div class="skeleton"><span></span><span></span></div>
+  </section>
+</main>
+
+<footer>load-webpage-in-1f · no framework runtime</footer>
+<script>/*__BOOT_JS__*/</script>
+</body>
+</html>
