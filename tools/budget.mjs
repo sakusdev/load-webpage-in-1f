@@ -12,7 +12,7 @@ const scripts=[...html.matchAll(/<script\b[^>]*\bsrc=/gi)].length;
 const media=[...html.matchAll(/<(?:img|iframe|video|audio|source)\b[^>]*(?:src|poster)=["'](?!data:)/gi)].length;
 const preloads=[...html.matchAll(/<link\b[^>]*rel=["'][^"']*(?:preload|modulepreload)[^"']*["'][^>]*>/gi)].length;
 const inlineJs=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].reduce((n,m)=>n+Buffer.byteLength(m[1]),0);
-const thirdParty=[...html.matchAll(/https?:\/\/[^"'\s<]+/g)].length;
+const thirdParty=[...html.matchAll(/<(?:script|link|img|source|iframe|video|audio)\b[^>]*(?:src|href|poster)=["']https?:\/\/[^"']+["']/gi)].length;
 const initialRequests=1+styles+scripts+media+preloads;
 
 const rows=[
