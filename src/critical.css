@@ -1,13 +1,7 @@
-*{box-sizing:border-box}html{color-scheme:dark;scroll-behavior:smooth}body,h1,p{margin:0}a{color:inherit}
-:root{--page:min(1180px,calc(100% - 40px));background:#07080b;color:#f5f7fb;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-body{min-width:320px;min-height:100dvh;overflow-x:hidden;background:#07080b}
-.top{height:72px;width:var(--page);margin:auto;display:flex;align-items:center}
-.brand{display:grid;place-items:center;width:38px;height:38px;border:1px solid #ffffff22;border-radius:12px;background:#ffffff08;text-decoration:none;font-weight:800;letter-spacing:-.06em;font-size:20px}
-.hero{width:var(--page);min-height:calc(100svh - 72px);margin:auto;padding:clamp(72px,11vh,128px) 0 48px;contain:layout paint style}
-.kicker{text-transform:uppercase;letter-spacing:.18em;font-size:11px;font-weight:700;color:#97a2bc;margin-bottom:22px}
-h1{font-size:clamp(58px,9.2vw,132px);line-height:.84;letter-spacing:-.078em;font-weight:720;max-width:9ch}
+*{box-sizing:border-box}html{color-scheme:dark}body,h1,p{margin:0}
+body{min-width:320px;background:#07080b;color:#f5f7fb;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.hero{width:min(1180px,calc(100% - 40px));min-height:100svh;margin:auto;display:grid;align-content:center;gap:24px;contain:layout paint style}
+.meta{display:flex;align-items:center;gap:14px;color:#8e97aa;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.16em}
+.meta b{display:grid;place-items:center;width:34px;height:34px;border:1px solid #ffffff22;border-radius:11px;color:#fff;font-size:16px;letter-spacing:-.06em}
+h1{font-size:clamp(60px,9.5vw,136px);line-height:.84;letter-spacing:-.078em;font-weight:720;max-width:9ch}
 h1 em{font-style:normal;color:#aab6ff}
-.lede{margin-top:30px;max-width:570px;color:#a4abba;font-size:clamp(16px,2vw,20px);line-height:1.5;letter-spacing:-.02em}
-.primary{display:inline-flex;align-items:center;gap:18px;margin-top:32px;text-decoration:none;background:#f7f8fb;color:#08090c;padding:13px 16px 13px 20px;border-radius:13px;font-size:13px;font-weight:750}
-.primary span{font-size:16px}
-@media(max-width:720px){.hero{padding-top:68px}}
