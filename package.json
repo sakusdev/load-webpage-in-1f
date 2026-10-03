@@ -1,0 +1,16 @@
+{
+  "name": "load-webpage-in-1f",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "budget": "node tools/budget.mjs",
+    "benchmark": "node tools/benchmark.mjs",
+    "serve": "node tools/serve.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "wrangler": "^4.0.0"
+  }
+}
