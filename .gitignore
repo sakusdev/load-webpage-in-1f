@@ -1,0 +1,5 @@
+node_modules/
+dist/
+benchmark.json
+.wrangler/
+.DS_Store
