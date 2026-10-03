@@ -1,6 +1,6 @@
 <style>
 .slot{width:min(1180px,calc(100% - 40px));margin:0 auto;content-visibility:auto;contain-intrinsic-size:auto 720px}
-.next{min-height:700px}.deep{min-height:620px}.panel{padding:64px 0 86px}.intro{display:flex;align-items:end;justify-content:space-between;gap:24px;padding:34px 0 64px}.lede{max-width:570px;color:#a4abba;font-size:clamp(16px,2vw,20px);line-height:1.5;letter-spacing:-.02em}.primary{display:inline-flex;align-items:center;gap:18px;text-decoration:none;background:#f7f8fb;color:#08090c;padding:13px 16px 13px 20px;border-radius:13px;font-size:13px;font-weight:750}.primary span{font-size:16px}
+.next{min-height:700px}.deep{min-height:620px}.panel{padding:64px 0 86px}.intro{display:flex;align-items:end;justify-content:space-between;gap:24px;padding:34px 0 64px}.lede{max-width:570px;color:#a4abba;font-size:clamp(16px,2vw,20px);line-height:1.5;letter-spacing:-.02em}.primary{display:inline-flex;align-items:center;gap:18px;text-decoration:none;background:#f7f8fb;color:#08090c;padding:13px 16px 13px 20px;border-radius:13px;font-size:13px;font-weight:750}.primary span{font-size:16px}.instant-link{display:inline-flex;margin-left:14px;color:#aab6ff;text-decoration:none;font-size:13px}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid #ffffff10;margin-bottom:86px}
 .metrics div{padding:20px 18px 18px 0;display:grid;gap:3px;border-right:1px solid #ffffff0d}
 .metrics div:last-child{border-right:0}.metrics strong{font-size:24px;letter-spacing:-.05em}.metrics span{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#6f7789}
@@ -18,7 +18,7 @@
 </style>
 <div class="intro">
   <p class="lede">One document. Zero render-blocking dependencies. Everything else waits its turn.</p>
-  <a class="primary" href="#architecture">See the architecture <span>↘</span></a>
+  <div><a class="primary" href="#architecture">See the architecture <span>↘</span></a><a class="instant-link" href="/instant.html">Prerender demo →</a></div>
 </div>
 <div class="panel">
   <div class="metrics" aria-label="performance contract">
