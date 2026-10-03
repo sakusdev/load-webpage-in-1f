@@ -27,5 +27,6 @@ await writeFile(join(out,"index.html"),html+"\n");
 await cp(join(src,"fragments"),join(out,"fragments"),{recursive:true,force:true});
 await cp(join(src,"boot.js"),join(out,"boot.js"),{force:true});
 await cp(join(src,"baseline.html"),join(out,"baseline.html"),{force:true});
+await cp(join(src,"instant.html"),join(out,"instant.html"),{force:true});
 
 console.log(`built dist/index.html (${Buffer.byteLength(html)} bytes raw)`);
