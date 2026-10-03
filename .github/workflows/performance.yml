@@ -1,0 +1,33 @@
+name: first-frame performance
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install
+      - run: npm run build
+      - name: Enforce first-flight budget
+        run: npm run budget
+      - name: Install benchmark browser
+        run: npx playwright install --with-deps chromium
+      - name: Measure local first paint
+        run: npm run benchmark
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: first-frame-benchmark
+          path: benchmark.json
+          if-no-files-found: ignore
