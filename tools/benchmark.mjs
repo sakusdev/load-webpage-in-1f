@@ -5,13 +5,13 @@ import {server} from "./serve.mjs";
 const PORT=8788;
 await new Promise(r=>server.listen(PORT,"127.0.0.1",r));
 const browser=await chromium.launch({headless:true});
-const runs=[];
 
-try{
+async function measure(path, enforceRequests=false){
+  const runs=[];
   for(let i=0;i<7;i++){
     const context=await browser.newContext();
     const page=await context.newPage();
-    await page.goto(`http://127.0.0.1:${PORT}/`,{waitUntil:"load"});
+    await page.goto(`http://127.0.0.1:${PORT}${path}`,{waitUntil:"load"});
     await page.waitForTimeout(80);
     const m=await page.evaluate(()=>{
       const nav=performance.getEntriesByType("navigation")[0];
@@ -29,37 +29,57 @@ try{
     runs.push(m);
     await context.close();
   }
+  const med=a=>{const v=a.filter(Number.isFinite).sort((x,y)=>x-y);return v[Math.floor(v.length/2)]??null};
+  const fcpValues=runs.map(x=>x.fcp);
+  const sorted=fcpValues.filter(Number.isFinite).sort((a,b)=>a-b);
+  return {
+    medianFcpMs:med(fcpValues),
+    p95FcpMs:sorted[Math.min(sorted.length-1,Math.ceil(sorted.length*.95)-1)]??null,
+    medianRenderAfterResponseMs:med(runs.map(x=>x.renderAfterResponse)),
+    maxRequestsBeforeFcp:Math.max(...runs.map(x=>x.requestsBeforeFcp)),
+    runs,
+    enforceRequests
+  };
+}
+
+let site,baseline;
+try{
+  site=await measure("/",true);
+  baseline=await measure("/baseline.html");
 }finally{
   await browser.close();
   await new Promise(r=>server.close(r));
 }
 
-const values=runs.map(x=>x.fcp).filter(Number.isFinite).sort((a,b)=>a-b);
-const median=values[Math.floor(values.length/2)]??null;
-const p95=values[Math.min(values.length-1,Math.ceil(values.length*.95)-1)]??null;
-const maxRequestsBeforeFcp=Math.max(...runs.map(x=>x.requestsBeforeFcp));
-const renderValues=runs.map(x=>x.renderAfterResponse).filter(Number.isFinite).sort((a,b)=>a-b);
-const medianRender=renderValues[Math.floor(renderValues.length/2)]??null;
 const report={
   targetMs120Hz:8.33,
   targetMs60Hz:16.67,
-  medianFcpMs:median,
-  p95FcpMs:p95,
-  medianRenderAfterResponseMs:medianRender,
-  oneFrame120Hz:median!==null&&median<=8.33,
-  maxRequestsBeforeFcp,
-  runs
+  medianFcpMs:site.medianFcpMs,
+  p95FcpMs:site.p95FcpMs,
+  medianRenderAfterResponseMs:site.medianRenderAfterResponseMs,
+  browserBaselineFcpMs:baseline.medianFcpMs,
+  browserBaselineRenderAfterResponseMs:baseline.medianRenderAfterResponseMs,
+  siteOverBaselineFcpMs:
+    site.medianFcpMs!=null&&baseline.medianFcpMs!=null
+      ? site.medianFcpMs-baseline.medianFcpMs
+      : null,
+  oneFrame120Hz:site.medianFcpMs!==null&&site.medianFcpMs<=8.33,
+  maxRequestsBeforeFcp:site.maxRequestsBeforeFcp,
+  runs:site.runs,
+  baselineRuns:baseline.runs
 };
 await writeFile("benchmark.json",JSON.stringify(report,null,2)+"\n");
 
-console.log("\nLOCAL BROWSER BENCHMARK (informational)\n");
-console.log(`median FCP  ${median?.toFixed(2)??"n/a"} ms`);
-console.log(`p95 FCP     ${p95?.toFixed(2)??"n/a"} ms`);
-console.log(`render only ${medianRender?.toFixed(2)??"n/a"} ms (responseEnd → FCP)`);
-console.log(`120 Hz 1F   ${report.oneFrame120Hz?"HIT":"MISS"} (8.33 ms target)`);
-console.log(`requests ≤ FCP ${maxRequestsBeforeFcp} (must be 1)`);
-console.log("\nCI browser timing is intentionally non-blocking; runner scheduling is not a network/rendering SLA.");
-if(maxRequestsBeforeFcp!==1){
+console.log("\nLOCAL BROWSER BENCHMARK\n");
+console.log(`site median FCP      ${site.medianFcpMs?.toFixed(2)??"n/a"} ms`);
+console.log(`site p95 FCP         ${site.p95FcpMs?.toFixed(2)??"n/a"} ms`);
+console.log(`site render only     ${site.medianRenderAfterResponseMs?.toFixed(2)??"n/a"} ms`);
+console.log(`browser baseline FCP ${baseline.medianFcpMs?.toFixed(2)??"n/a"} ms`);
+console.log(`site overhead        ${report.siteOverBaselineFcpMs?.toFixed(2)??"n/a"} ms`);
+console.log(`120 Hz 1F            ${report.oneFrame120Hz?"HIT":"MISS"} (8.33 ms target)`);
+console.log(`requests ≤ FCP       ${site.maxRequestsBeforeFcp} (must be 1)`);
+console.log("\nCI timing is informational except for the one-request-before-FCP contract.");
+if(site.maxRequestsBeforeFcp!==1){
   console.error("\nFAIL — deferred traffic started before first contentful paint");
   process.exit(1);
 }
