@@ -42,10 +42,43 @@ async function measure(path, enforceRequests=false){
   };
 }
 
-let site,baseline;
+async function measurePrerender(){
+  const context=await browser.newContext();
+  const page=await context.newPage();
+  const target=`http://127.0.0.1:${PORT}/instant.html`;
+  let result={prerendered:false,activationStartMs:0,fcpMs:null,activationToFcpMs:null,clickToUrlMs:null,error:null};
+  try{
+    await page.goto(`http://127.0.0.1:${PORT}/`,{waitUntil:"load"});
+    await page.waitForSelector(".instant-link",{timeout:5000});
+    await page.waitForTimeout(700);
+    const t=performance.now();
+    await Promise.all([
+      page.waitForURL(target,{timeout:5000}),
+      page.click(".instant-link")
+    ]);
+    result.clickToUrlMs=performance.now()-t;
+    await page.waitForTimeout(50);
+    result={...result,...await page.evaluate(()=>{
+      const nav=performance.getEntriesByType("navigation")[0];
+      const fcp=performance.getEntriesByName("first-contentful-paint")[0]?.startTime??null;
+      const a=nav?.activationStart??0;
+      return {
+        prerendered:a>0,
+        activationStartMs:a,
+        fcpMs:fcp,
+        activationToFcpMs:a>0&&fcp!=null?Math.max(0,fcp-a):null
+      };
+    })};
+  }catch(e){result.error=String(e?.stack||e)}
+  await context.close();
+  return result;
+}
+
+let site,baseline,prerender;
 try{
   site=await measure("/",true);
   baseline=await measure("/baseline.html");
+  prerender=await measurePrerender();
 }finally{
   await browser.close();
   await new Promise(r=>server.close(r));
@@ -63,6 +96,7 @@ const report={
     site.medianFcpMs!=null&&baseline.medianFcpMs!=null
       ? site.medianFcpMs-baseline.medianFcpMs
       : null,
+  prerender,
   oneFrame120Hz:site.medianFcpMs!==null&&site.medianFcpMs<=8.33,
   maxRequestsBeforeFcp:site.maxRequestsBeforeFcp,
   runs:site.runs,
@@ -76,6 +110,9 @@ console.log(`site p95 FCP         ${site.p95FcpMs?.toFixed(2)??"n/a"} ms`);
 console.log(`site render only     ${site.medianRenderAfterResponseMs?.toFixed(2)??"n/a"} ms`);
 console.log(`browser baseline FCP ${baseline.medianFcpMs?.toFixed(2)??"n/a"} ms`);
 console.log(`site overhead        ${report.siteOverBaselineFcpMs?.toFixed(2)??"n/a"} ms`);
+console.log(`prerender activated  ${prerender.prerendered?"yes":"no"}`);
+console.log(`activation → FCP     ${prerender.activationToFcpMs?.toFixed(2)??"n/a"} ms`);
+console.log(`click → URL          ${prerender.clickToUrlMs?.toFixed(2)??"n/a"} ms`);
 console.log(`120 Hz 1F            ${report.oneFrame120Hz?"HIT":"MISS"} (8.33 ms target)`);
 console.log(`requests ≤ FCP       ${site.maxRequestsBeforeFcp} (must be 1)`);
 console.log("\nCI timing is informational except for the one-request-before-FCP contract.");
