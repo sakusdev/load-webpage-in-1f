@@ -1,6 +1,6 @@
 <style>
 .slot{width:min(1180px,calc(100% - 40px));margin:0 auto;content-visibility:auto;contain-intrinsic-size:auto 720px}
-.next{min-height:700px}.deep{min-height:620px}.panel{padding:86px 0}
+.next{min-height:700px}.deep{min-height:620px}.panel{padding:64px 0 86px}.intro{display:flex;align-items:end;justify-content:space-between;gap:24px;padding:34px 0 64px}.lede{max-width:570px;color:#a4abba;font-size:clamp(16px,2vw,20px);line-height:1.5;letter-spacing:-.02em}.primary{display:inline-flex;align-items:center;gap:18px;text-decoration:none;background:#f7f8fb;color:#08090c;padding:13px 16px 13px 20px;border-radius:13px;font-size:13px;font-weight:750}.primary span{font-size:16px}
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-block:1px solid #ffffff10;margin-bottom:86px}
 .metrics div{padding:20px 18px 18px 0;display:grid;gap:3px;border-right:1px solid #ffffff0d}
 .metrics div:last-child{border-right:0}.metrics strong{font-size:24px;letter-spacing:-.05em}.metrics span{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:#6f7789}
@@ -13,9 +13,13 @@
 .flow div{display:grid;grid-template-columns:120px 1fr auto;gap:16px;align-items:center;padding:18px 20px;background:#ffffff05}
 .flow small{color:#687083}.flow b{font-size:13px}.flow span{font:600 11px ui-monospace,SFMono-Regular,Menlo,monospace;color:#94a0b7}
 .site-footer{width:min(1180px,calc(100% - 40px));margin:0 auto;padding:50px 0 70px;color:#5d6474;font-size:11px;border-top:1px solid #ffffff0d}
-@media(max-width:720px){.metrics{grid-template-columns:1fr 1fr}.metrics div:nth-child(2){border-right:0}.cards{grid-template-columns:1fr}.flow div{grid-template-columns:86px 1fr}.flow span{grid-column:2}}
+@media(max-width:720px){.intro{align-items:start;flex-direction:column}.metrics{grid-template-columns:1fr 1fr}.metrics div:nth-child(2){border-right:0}.cards{grid-template-columns:1fr}.flow div{grid-template-columns:86px 1fr}.flow span{grid-column:2}}
 @media(prefers-reduced-motion:no-preference){.primary{transition:transform .16s ease}.primary:hover{transform:translateY(-2px)}}
 </style>
+<div class="intro">
+  <p class="lede">One document. Zero render-blocking dependencies. Everything else waits its turn.</p>
+  <a class="primary" href="#architecture">See the architecture <span>↘</span></a>
+</div>
 <div class="panel">
   <div class="metrics" aria-label="performance contract">
     <div><strong>1</strong><span>request to FCP</span></div>
