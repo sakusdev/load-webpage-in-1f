@@ -45,12 +45,24 @@ async function measure(path, enforceRequests=false){
 async function measurePrerender(){
   const context=await browser.newContext();
   const page=await context.newPage();
+  const client=await context.newCDPSession(page);
   const target=`http://127.0.0.1:${PORT}/instant.html`;
-  let result={prerendered:false,activationStartMs:0,fcpMs:null,activationToFcpMs:null,clickToUrlMs:null,error:null};
+  const statuses=[];
+  const ruleSets=[];
+  let requested=false;
+  page.on("request",r=>{if(r.url()===target)requested=true});
+  try{await client.send("Page.setPrerenderingAllowed",{isAllowed:true})}catch{}
+  try{
+    await client.send("Preload.enable");
+    client.on("Preload.prerenderStatusUpdated",e=>statuses.push(e));
+    client.on("Preload.ruleSetUpdated",e=>ruleSets.push(e.ruleSet));
+  }catch{}
+  let result={prerendered:false,supported:false,requested:false,activationStartMs:0,fcpMs:null,activationToFcpMs:null,clickToUrlMs:null,statuses:[],ruleSets:[],error:null};
   try{
     await page.goto(`http://127.0.0.1:${PORT}/`,{waitUntil:"load"});
     await page.waitForSelector(".instant-link",{timeout:5000});
-    await page.waitForTimeout(700);
+    result.supported=await page.evaluate(()=>!!HTMLScriptElement.supports?.("speculationrules"));
+    await page.waitForTimeout(1200);
     const t=performance.now();
     await Promise.all([
       page.waitForURL(target,{timeout:5000}),
@@ -58,7 +70,7 @@ async function measurePrerender(){
     ]);
     result.clickToUrlMs=performance.now()-t;
     await page.waitForTimeout(50);
-    result={...result,...await page.evaluate(()=>{
+    result={...result,requested,statuses,ruleSets,...await page.evaluate(()=>{
       const nav=performance.getEntriesByType("navigation")[0];
       const fcp=performance.getEntriesByName("first-contentful-paint")[0]?.startTime??null;
       const a=nav?.activationStart??0;
