@@ -28,9 +28,15 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: Measure local first paint
         run: npm run benchmark
+      - name: Measure production HTTP protocol and latency
+        env:
+          BENCHMARK_URL: https://load-webpage-in-1f.pages.dev/
+        run: npm run benchmark:network
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: first-frame-benchmark
-          path: benchmark.json
+          path: |
+            benchmark.json
+            network-benchmark.json
           if-no-files-found: ignore
