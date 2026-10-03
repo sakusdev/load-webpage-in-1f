@@ -35,12 +35,14 @@ try{
 const values=runs.map(x=>x.fcp).filter(Number.isFinite).sort((a,b)=>a-b);
 const median=values[Math.floor(values.length/2)]??null;
 const p95=values[Math.min(values.length-1,Math.ceil(values.length*.95)-1)]??null;
+const maxRequestsBeforeFcp=Math.max(...runs.map(x=>x.requestsBeforeFcp));
 const report={
   targetMs120Hz:8.33,
   targetMs60Hz:16.67,
   medianFcpMs:median,
   p95FcpMs:p95,
   oneFrame120Hz:median!==null&&median<=8.33,
+  maxRequestsBeforeFcp,
   runs
 };
 await writeFile("benchmark.json",JSON.stringify(report,null,2)+"\n");
@@ -49,4 +51,9 @@ console.log("\nLOCAL BROWSER BENCHMARK (informational)\n");
 console.log(`median FCP  ${median?.toFixed(2)??"n/a"} ms`);
 console.log(`p95 FCP     ${p95?.toFixed(2)??"n/a"} ms`);
 console.log(`120 Hz 1F   ${report.oneFrame120Hz?"HIT":"MISS"} (8.33 ms target)`);
+console.log(`requests ≤ FCP ${maxRequestsBeforeFcp} (must be 1)`);
 console.log("\nCI browser timing is intentionally non-blocking; runner scheduling is not a network/rendering SLA.");
+if(maxRequestsBeforeFcp!==1){
+  console.error("\nFAIL — deferred traffic started before first contentful paint");
+  process.exit(1);
+}
