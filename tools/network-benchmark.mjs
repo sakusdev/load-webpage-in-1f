@@ -99,7 +99,13 @@ for (const mode of modes) {
         encodedBodySize: nav?.encodedBodySize ?? null,
         decodedBodySize: nav?.decodedBodySize ?? null,
         firstPaintMs: paints["first-paint"] ?? null,
-        fcpMs: paints["first-contentful-paint"] ?? null
+        fcpMs: paints["first-contentful-paint"] ?? null,
+        renderAfterResponseMs:
+          nav && paints["first-contentful-paint"] != null
+            ? Math.max(0, paints["first-contentful-paint"] - nav.responseEnd)
+            : null,
+        parseToDomContentLoadedMs:
+          nav ? Math.max(0, nav.domContentLoadedEventEnd - nav.responseEnd) : null
       };
     });
 
@@ -157,6 +163,7 @@ for (const mode of report.modes) {
       "reused=" + String(run.connectionReused).padEnd(5) + " " +
       "TTFB=" + (run.ttfbMs?.toFixed(2) ?? "n/a") + "ms " +
       "FCP=" + (run.fcpMs?.toFixed(2) ?? "n/a") + "ms " +
+      "render=" + (run.renderAfterResponseMs?.toFixed(2) ?? "n/a") + "ms " +
       "transfer=" + (run.transferSize ?? "n/a") + "B " +
       "remote=" + (run.remoteIPAddress ?? "n/a")
     );
